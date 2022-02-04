@@ -9,7 +9,7 @@ toc_float: yes
 df_print: paged
 theme: lumen
 number_sections: yes
-css: pmxpartab_defaults.css
+css: css/pmxpartab_defaults.css
 
 knitr: (function(inputFile, encoding) {
   rmarkdown::render(inputFile, encoding = encoding,
@@ -27,33 +27,36 @@ knitr::opts_chunk$set(echo = TRUE)
 # Setup environment
 ```{r envir, message = FALSE, warning = FALSE}
 
-# ----- Load libraries -----
-library(tidyverse)
-library(knitr)
-library(xpose)
-library(yaml)
-library(htmltools)
-
-# ----- Load functions  -----
-source("functions.r")
+# ----- Load package -----
+library(pmxpartabc)
 
 # ----- Define directory and file names -----
-run_dir    <- '../examples/'
-run_dir.boot <- 'bootstrap_dir2'
+run_dir    <- file.path(system.file(package = "pmxpartabc"), "examples")
+run_dir.boot <- file.path(run_dir, 'bootstrap_dir2')
 run_prefix <- "run"
 runno     <-  "6"
 runno.boot <- "5boot"
+yaml.file.name <- file.path(system.file(package = "pmxpartabc"), "meta.yaml")
 
 ```
 
 # Parameter table 1 - using yaml file
 ```{r all-runs-1, results='asis', warning = FALSE}
 
-output=parframe2setup(run_dir, run_prefix, runno, bootstrap = TRUE, run_dir.boot, runno.boot, conf.level = 0.95, min_suc = TRUE, yaml.file = TRUE, yaml.file.name = 'meta.yaml')
+output <- parframe2setup(run_dir, 
+                         run_prefix, 
+                         runno,
+                         bootstrap = TRUE, 
+                         run_dir.boot, 
+                         runno.boot, 
+                         conf.level = 0.95, 
+                         min_suc = TRUE, 
+                         yaml.file = TRUE, 
+                         yaml.file.name = yaml.file.name)
 
-tab=parframe(out=output[[1]], meta=output[[2]], bootstrap=TRUE)  
+tab <- parframe(out=output[[1]], meta=output[[2]], bootstrap=TRUE)  
 
-tab1=pmxpartab(tab, output[[2]], columns=c(value="Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage"))
+tab1 <- pmxpartab(tab, output[[2]], columns=c(value="Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage"))
 
 print(tab1)
 

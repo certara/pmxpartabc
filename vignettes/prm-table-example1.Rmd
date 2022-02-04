@@ -27,27 +27,26 @@ knitr::opts_chunk$set(echo = TRUE)
 # Setup environment
 ```{r envir, message = FALSE, warning = FALSE}
 
-# ----- Load libraries -----
-library(tidyverse)
-library(knitr)
-library(xpose)
-library(yaml)
-library(htmltools)
-
-# ----- Load functions  -----
-source("functions.r")
+# ----- Load package -----
+library(pmxpartabc)
 
 # ----- Define directory and file names -----
-run_dir    <- '../examples/'
+run_dir    <- file.path(system.file(package = "pmxpartabc"), "examples")
 run_prefix <- "run"
 runno     <-  "6"
-
+yaml.file.name <- file.path(system.file(package = "pmxpartabc"), "meta.yaml")
 ```
 
 # Parameter table 1 - using yaml file
 ```{r all-runs-1, results='asis', warning = FALSE}
 
-output=parframe2setup(run_dir, run_prefix, runno, conf.level = 0.95, min_suc = TRUE, yaml.file = TRUE, yaml.file.name = 'meta.yaml')
+output <- parframe2setup(run_dir, 
+                      run_prefix, 
+                      runno, 
+                      conf.level = 0.95, 
+                      min_suc = TRUE, 
+                      yaml.file = TRUE, 
+                      yaml.file.name = yaml.file.name)
 
 tab=parframe(out=output[[1]], meta=output[[2]])  
 
