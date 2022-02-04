@@ -1,5 +1,7 @@
 `%>%` <- magrittr::`%>%`
 
+#' @title Import files from NONMEM folder to generate paremeter table
+#'
 #' @description  reads all relevant inputs (ie, parameter estimates, bootstrap, shrinkage, etc.) using directly model run or with the help of a YAML file.
 #' The parameter name must be provided in the model file. Other fields are optional and can be provided either in (1) the model file or a (2) YAML file.
 #' Few fields needs to be inputted directly from user to complete the table:
@@ -75,6 +77,7 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
     df_m = do.call(dplyr::bind_rows, list(parmaters=prm$meta)) %>% tibble::as_tibble() %>% dplyr::mutate(type = factor(type, levels = c('Structural','CovariateEffect','IIV', 'IOV','RUV'))) %>% dplyr::arrange(type) %>% dplyr::mutate(type = as.character(type))
 
   } else { #yaml file
+    stopifnot(file.exists(yaml.file.name))
 
     prm <- xpose::get_prm(xpdb, transform = FALSE) %>%
       dplyr::rowwise() %>%
@@ -97,7 +100,7 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
 
     prm$name = unlist(lapply(prm$meta, function(x) x[c('name')]))
 
-    meta <- read_yaml(file = yaml.file.name)
+    meta <- yaml::read_yaml(file = yaml.file.name)
     list(meta)
 
     meta$parameters
@@ -161,6 +164,8 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
 
 }
 
+#' @title Create parameter \code{data.frame}
+#'
 #' @description Get all relevant parameter information in a data.frame, input the desired transformation for parameters
 
 #' and finally merge parameter estimates with their corresponding meta information
@@ -347,6 +352,8 @@ parframe <- function(out, meta, bootstrap = NULL, conf.level = 0.95) {
   as.data.frame(z)
 }
 
+#' @title Create html table from parframe
+#'
 #' @description Uses the output from parframe to generate a parameter estimates table in HTML
 #'
 #' @param parframe object from parframe
