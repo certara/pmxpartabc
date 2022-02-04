@@ -18,6 +18,10 @@ Suggests:
     knitr,
 Imports:
     data.table,
+    dplyr,
+    purrr,
+    stringr,
+    tidyr,
     table1,
     utils,
     xpose
