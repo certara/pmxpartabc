@@ -9,4 +9,4 @@ License: GPL-3
 Imports: utils,table1,data.table
 Suggests: knitr
 VignetteBuilder: knitr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
