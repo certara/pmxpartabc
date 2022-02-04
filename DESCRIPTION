@@ -1,12 +1,23 @@
-Package: pmxpartab
-Type: Package
-Version: 0.1
-Date: 2021-04-14
+Package: pmxpartabc
+Version: 0.2.0
+Date: 2022-02-04
 Title: Parameter Tables for PMx Analyses
-Authors@R: person("Benjamin", "Rich", role=c("aut", "cre"), email="mail@benjaminrich.net")
-Description: TBD
+Authors@R: c(
+      person("Anna Larjagolli", role = c("aut", "cre"), email = "anna.largajolli@certara.com"),
+      person("Benjamin", "Rich", role= "aut", email = "mail@benjaminrich.net"),
+      person("Olivier", "Barriere", role = "aut", email = "olivier.barriere@certara.com"),
+      person("Sinziana", "Cristea", role = "aut", email = "sinziana.cristea@certara.com"),
+      person("James", "Craig", role = "aut", email = "james.craig@certara.com")
+      )
+Description: Generate paremeter estimates tables from NONMEM run output
 License: GPL-3
-Imports: utils,table1,data.table
-Suggests: knitr
-VignetteBuilder: knitr
+Encoding: UTF-8
+LazyData: true
 RoxygenNote: 7.1.2
+Suggests:
+    knitr,
+Imports:
+    data.table,
+    table1,
+    utils,
+    xpose
