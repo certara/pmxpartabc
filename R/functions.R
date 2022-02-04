@@ -1,3 +1,5 @@
+`%>%` <- magrittr::`%>%`
+
 #' @description  reads all relevant inputs (ie, parameter estimates, bootstrap, shrinkage, etc.) using directly model run or with the help of a YAML file.
 #' The parameter name must be provided in the model file. Other fields are optional and can be provided either in (1) the model file or a (2) YAML file.
 #' Few fields needs to be inputted directly from user to complete the table:
@@ -24,17 +26,23 @@
 
 parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir.boot = NULL, runno.boot = NULL, conf.level = 0.95, min_suc = TRUE, read.boot = NULL, boot.obj = NULL, yaml.file = NULL, yaml.file.name = NULL) {
 
+  stopifnot(dir.exists(run_dir))
   #Load xpose database
-  xpdb   <- xpose_data(prefix = run_prefix, runno = runno, dir = run_dir)
+  xpdb   <- xpose::xpose_data(prefix = run_prefix, runno = runno, dir = run_dir)
 
   # set-up bootstrap info if available
   have.bootstrap <- !is.null(bootstrap)
   read.bootstrap <- !is.null(read.boot)
   have.boot.obj  <- !is.null(boot.obj)
   if (have.bootstrap & !(read.bootstrap)) {
-    boot_dir <- paste0(run_dir, run_dir.boot)
-    boot_res <- sprintf("/raw_results_%s%s.csv", run_prefix, ifelse(is.null(runno.boot),runno,runno.boot))
-    boot   <- read.csv(paste0(boot_dir, boot_res), header = TRUE, check.names = FALSE)
+    if(!dir.exists(run_dir.boot)){ #check if relative path
+      boot_dir <- file.path(run_dir, run_dir.boot)
+      stopifnot(dir.exists(boot_dir))
+    } else {
+      boot_dir <- run_dir.boot
+    }
+    boot_res <- sprintf("raw_results_%s%s.csv", run_prefix, ifelse(is.null(runno.boot),runno,runno.boot))
+    boot   <- read.csv(file.path(boot_dir, boot_res), header = TRUE, check.names = FALSE)
   } else if (have.bootstrap & read.bootstrap & have.boot.obj) {
     boot <- boot.obj
   }
@@ -43,10 +51,10 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
   yaml.file <- is.null(yaml.file)
   if (yaml.file){
 
-    prm <- get_prm(xpdb, transform = FALSE) %>%
-      rowwise() %>%
-      rename(name.xpose = name) %>%
-      mutate(meta = ifelse((label!=""),map(label,parse_parameter_description),list(list(name = ''))))
+    prm <- xpose::get_prm(xpdb, transform = FALSE) %>%
+      dplyr::rowwise() %>%
+      dplyr::rename(name.xpose = name) %>%
+      dplyr::mutate(meta = ifelse((label!=""),purrr::map(label,parse_parameter_description),list(list(name = ''))))
 
     vec=prm %>% dplyr::select(m,n,diagonal,meta)
     off.diag = which(prm$diagonal == FALSE)
@@ -64,14 +72,14 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
 
     prm$name = unlist(lapply(prm$meta, function(x) x[c('name')]))
 
-    df_m = do.call(bind_rows, list(parmaters=prm$meta)) %>% as_tibble() %>% mutate(type = factor(type, levels = c('Structural','CovariateEffect','IIV', 'IOV','RUV'))) %>% arrange(type) %>% mutate(type = as.character(type))
+    df_m = do.call(dplyr::bind_rows, list(parmaters=prm$meta)) %>% tibble::as_tibble() %>% dplyr::mutate(type = factor(type, levels = c('Structural','CovariateEffect','IIV', 'IOV','RUV'))) %>% dplyr::arrange(type) %>% dplyr::mutate(type = as.character(type))
 
   } else { #yaml file
 
-    prm <- get_prm(xpdb, transform = FALSE) %>%
-      rowwise() %>%
-      rename(name.xpose = name) %>%
-      mutate(meta = ifelse((label!=""),map(label,parse_parameter_description),list(list(name = ''))))
+    prm <- xpose::get_prm(xpdb, transform = FALSE) %>%
+      dplyr::rowwise() %>%
+      dplyr::rename(name.xpose = name) %>%
+      dplyr::mutate(meta = ifelse((label!=""),purrr::map(label,parse_parameter_description),list(list(name = ''))))
 
     vec=prm %>% dplyr::select(m,n,diagonal,meta)
     off.diag = which(prm$diagonal == FALSE & prm$label=='')
@@ -93,36 +101,36 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
     list(meta)
 
     meta$parameters
-    do.call(bind_rows, meta$parameters) %>% as_tibble() -> tmp
+    do.call(dplyr::bind_rows, meta$parameters) %>% tibble::as_tibble() -> tmp
 
     if(is.null(tmp$trans)) {tmp$trans = NA}
     if(is.null(tmp$units)) {tmp$units = NA}
     if(is.null(tmp$label)) {tmp$label = NA}
     if(is.null(tmp$type)) {tmp$type = NA}
-    df_m = tmp %>% select(name, label, units, trans, type)
+    df_m = tmp %>% dplyr::select(name, label, units, trans, type)
 
   }
 
   # merge shrinkage information
 
-  if (nrow(prm %>% filter(type %in% c("ome","sig") & !fixed))>0) {
+  if (nrow(prm %>% dplyr::filter(type %in% c("ome","sig") & !fixed))>0) {
     etashk = data.frame(type = "ome",
-                        shk = strsplit(xpdb$summary %>% filter(label=="etashk") %>% pull(value), split=", ")[[1]]) %>%
-      mutate(m = as.numeric(gsub(".*\\[(\\d+)\\].*", "\\1", shk)),
+                        shk = strsplit(xpdb$summary %>% dplyr::filter(label=="etashk") %>% dplyr::pull(value), split=", ")[[1]]) %>%
+      dplyr::mutate(m = as.numeric(gsub(".*\\[(\\d+)\\].*", "\\1", shk)),
              n = m, # added to ensure that shrinkage only joins diagonal omega
              shk = as.numeric(gsub("\\[.*", "", shk)))
 
     epsshk = data.frame(type = "sig",
-                        shk = strsplit(xpdb$summary %>% filter(label=="epsshk") %>% pull(value), split=", ")[[1]]) %>%
-      mutate(m = as.numeric(gsub(".*\\[(\\d+)\\].*", "\\1", shk)),
+                        shk = strsplit(xpdb$summary %>% dplyr::filter(label=="epsshk") %>% dplyr::pull(value), split=", ")[[1]]) %>%
+      dplyr::mutate(m = as.numeric(gsub(".*\\[(\\d+)\\].*", "\\1", shk)),
              n = m, # added to ensure that shrinkage only joins diagonal omega
              shk = as.numeric(gsub("\\[.*", "", shk)))
     shk.tmp = rbind(etashk,epsshk)
     prm = prm %>%
-      left_join(shk.tmp, by=c("type", "m", "n")) %>% rename(shrinkage = shk)
-    if (prm$value[str_detect(prm$name.xpose,'SIGMA')]==1){ # error coded with fixed effects
+      dplyr::left_join(shk.tmp, by=c("type", "m", "n")) %>% dplyr::rename(shrinkage = shk)
+    if (prm$value[stringr::str_detect(prm$name.xpose,'SIGMA')]==1){ # error coded with fixed effects
 
-      prm$shrinkage[str_detect(prm$label,'ERR') | str_detect(prm$label,'PROP') | str_detect(prm$label,'ADD')]=prm$shrinkage[str_detect(prm$name.xpose,'SIGMA')]
+      prm$shrinkage[stringr::str_detect(prm$label,'ERR') | stringr::str_detect(prm$label,'PROP') | stringr::str_detect(prm$label,'ADD')]=prm$shrinkage[stringr::str_detect(prm$name.xpose,'SIGMA')]
 
     }
 
@@ -132,17 +140,17 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
   if (have.bootstrap) {
 
     if (min_suc){
-      boot = boot %>% filter(minimization_successful!=0) # default remove the unsuccessful runs
+      boot = boot %>% dplyr::filter(minimization_successful!=0) # default remove the unsuccessful runs
     }
-    boot = boot[,(which(names(boot)=='ofv')+1):(which(regexpr("^se", names(boot), perl=T)==1)[1]-1)]  # select the columns of interest
+    boot = boot[,(which(names(boot)=='ofv')+1):(which(regexpr("^se", names(boot), perl=T)==1)[1]-1)]  # dplyr::select the columns of interest
     boot = boot %>%
-      gather(key = "label_boot") %>% # long format
-      group_by(label_boot) %>%
-      mutate(bootstrap.median = median(value,na.rm = TRUE),
+      tidyr::gather(key = "label_boot") %>% # long format
+      dplyr::group_by(label_boot) %>%
+      dplyr::mutate(bootstrap.median = median(value,na.rm = TRUE),
              bootstrap.uci    = quantile(value,probs=c((1+conf.level)/2), na.rm = TRUE),
              bootstrap.lci    = quantile(value,probs=c((1-conf.level)/2), na.rm = TRUE)) %>%
-      ungroup() %>%
-      distinct(label_boot, .keep_all = TRUE) %>%
+      dplyr::ungroup() %>%
+      dplyr::distinct(label_boot, .keep_all = TRUE) %>%
       dplyr::select(-value)
 
     prm = cbind(prm,boot)
