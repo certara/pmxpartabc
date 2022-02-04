@@ -19,9 +19,11 @@ Suggests:
 Imports:
     data.table,
     dplyr,
+    magrittr,
     purrr,
     stringr,
     tidyr,
     table1,
     utils,
-    xpose
+    xpose,
+    yaml
