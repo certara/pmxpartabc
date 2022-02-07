@@ -6,3 +6,9 @@
 .*\.bak$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^doc$
+^LICENSE\.md$
+^docs$
+^pkgdown$
+^_pkgdown\.yml$
+^vignettes

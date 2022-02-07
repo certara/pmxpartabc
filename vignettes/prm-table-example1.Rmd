@@ -1,22 +1,14 @@
 ---
-title: "Working examples of parameter tables"
-subtitle: "Parameter table for final model"
-
-output:
-  html_document:
-  toc : yes
-toc_float: yes
-df_print: paged
-theme: lumen
-number_sections: yes
-css: pmxpartab_defaults.css
-
-knitr: (function(inputFile, encoding) {
-  rmarkdown::render(inputFile, encoding = encoding,
-                    output_format = "html_document") })
+title: "Example 1"
+output: rmarkdown::html_vignette
+css: css/pmxpartab_defaults.css
+vignette: >
+  %\VignetteIndexEntry{Example 1}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
-Example with all information in the yaml file (except from parameter name). No bootstrap information available (ie, CI calculated with normal distribution assumptions).
+Example with all information coded in the NONMEM run and bootstrap information available.
   
 ```{r setup, include=FALSE}
 
@@ -30,27 +22,30 @@ knitr::opts_chunk$set(echo = TRUE)
 # ----- Load package -----
 library(pmxpartabc)
 
-# ----- Define directory and file names -----
+# Specify run directories
 run_dir    <- file.path(system.file(package = "pmxpartabc"), "examples")
+run_dir.boot <- file.path(run_dir, 'bootstrap_dir2')
 run_prefix <- "run"
-runno     <-  "6"
-yaml.file.name <- file.path(system.file(package = "pmxpartabc"), "meta.yaml")
+runno     <-  "5"
+runno.boot <- "5boot"
+
 ```
 
-# Parameter table 1 - using yaml file
+# Parameter table 1 - using model output directly
 ```{r all-runs-1, results='asis', warning = FALSE}
 
 output <- parframe2setup(run_dir, 
-                      run_prefix, 
-                      runno, 
-                      conf.level = 0.95, 
-                      min_suc = TRUE, 
-                      yaml.file = TRUE, 
-                      yaml.file.name = yaml.file.name)
+                         run_prefix, 
+                         runno, 
+                         bootstrap = TRUE, 
+                         run_dir.boot, 
+                         runno.boot, 
+                         conf.level = 0.95, 
+                         min_suc = TRUE)
 
-tab=parframe(out=output[[1]], meta=output[[2]])  
+tab <- parframe(out=output[[1]], meta=output[[2]], bootstrap=TRUE)  
 
-tab1=pmxpartab(tab, output[[2]], columns=c(value="Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage"))
+tab1 <- pmxpartab(tab, output[[2]], columns=c(value="Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage"))
 
 print(tab1)
 

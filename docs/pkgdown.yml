@@ -1,0 +1,10 @@
+pandoc: 2.11.4
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  prm-table-example1: prm-table-example1.html
+  prm-table-example2: prm-table-example2.html
+  prm-table-example3: prm-table-example3.html
+  prm-table-example4: prm-table-example4.html
+last_built: 2022-02-07T16:33Z
+

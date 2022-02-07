@@ -1,0 +1,21 @@
+template:
+  params:
+    bootswatch: united
+navbar:
+  structure:
+    left:  [home, reference, articles]
+    right: [github]
+    navbar:
+  components:
+    home: ~
+    articles:
+     text: Vignettes
+     menu:
+     - text: Example 1
+       href: articles/prm-table-example1.html
+     - text: Example 2
+       href: articles/prm-table-example2.html
+     - text: Example 3
+       href: articles/prm-table-example3.html
+     - text: Example 4
+       href: articles/prm-table-example4.html

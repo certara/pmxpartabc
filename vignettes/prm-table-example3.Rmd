@@ -1,22 +1,15 @@
 ---
-title: "Working examples of parameter tables"
-subtitle: "Parameter table for final model"
-
-output:
-  html_document:
-  toc : yes
-toc_float: yes
-df_print: paged
-theme: lumen
-number_sections: yes
+title: "Example 3"
+output: rmarkdown::html_vignette
 css: css/pmxpartab_defaults.css
-
-knitr: (function(inputFile, encoding) {
-  rmarkdown::render(inputFile, encoding = encoding,
-                    output_format = "html_document") })
+vignette: >
+  %\VignetteIndexEntry{Example 3}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
-Example with all information in the yaml file (except from parameter name) and pre-filtered bootstrap results passed by user.
+
+Example with all information in the yaml file (except from parameter name) and bootstrap information available.
   
 ```{r setup, include=FALSE}
 
@@ -32,9 +25,10 @@ library(pmxpartabc)
 
 # ----- Define directory and file names -----
 run_dir    <- file.path(system.file(package = "pmxpartabc"), "examples")
+run_dir.boot <- file.path(run_dir, 'bootstrap_dir2')
 run_prefix <- "run"
 runno     <-  "6"
-boot.object <-  read.csv(file.path(run_dir, "bootstrap_dir2", "raw_results_run5boot.csv"), header = TRUE, check.names = FALSE)
+runno.boot <- "5boot"
 yaml.file.name <- file.path(system.file(package = "pmxpartabc"), "meta.yaml")
 
 ```
@@ -44,12 +38,12 @@ yaml.file.name <- file.path(system.file(package = "pmxpartabc"), "meta.yaml")
 
 output <- parframe2setup(run_dir, 
                          run_prefix, 
-                         runno, 
+                         runno,
                          bootstrap = TRUE, 
+                         run_dir.boot, 
+                         runno.boot, 
                          conf.level = 0.95, 
                          min_suc = TRUE, 
-                         read.boot = TRUE, 
-                         boot.obj = boot.object, 
                          yaml.file = TRUE, 
                          yaml.file.name = yaml.file.name)
 
