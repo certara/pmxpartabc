@@ -13,7 +13,8 @@ parframe(out, meta, bootstrap = NULL, conf.level = 0.95)
 
 \item{bootstrap}{flag for availability of bootstrap results}
 
-\item{conf.level}{confidence interval of parameter estimates using normal distribution assumptions (in case no bootstrap rasults are available). By default set to 95%.}
+\item{conf.level}{confidence interval of parameter estimates using normal distribution assumptions (in case no bootstrap results are available).
+By default set to 95\%.}
 }
 \description{
 Get all relevant parameter information in a data.frame, input the desired transformation for parameters

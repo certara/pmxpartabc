@@ -1,31 +1,36 @@
 `%>%` <- magrittr::`%>%`
 
-#' @title Import files from NONMEM folder to generate paremeter table
+
+#' Import NONMEM output for parameter tables
 #'
-#' @description  reads all relevant inputs (ie, parameter estimates, bootstrap, shrinkage, etc.) using directly model run or with the help of a YAML file.
+#' @description Reads all relevant inputs (ie, parameter estimates, bootstrap, shrinkage, etc.) using directly model run or with the help of a YAML file.
 #' The parameter name must be provided in the model file. Other fields are optional and can be provided either in (1) the model file or a (2) YAML file.
 #' Few fields needs to be inputted directly from user to complete the table:
-#'   name (compulsory): name of parameter (eg, CL, Vd, nCL, nVd, etc.)
-#'   label:  description of parameter (eg, "Volume of distribution", "Apparent Clearance", etc.)
-#'   units: parameter unit (eg, L/h, 1/hr, etc)
-#'   trans: parameter transformation (ie, %, exp, ilogit, sqrt, CV%)
-#'   type:  Typical Values, Between Subject Variability, Inter Occasion Variability, Residual Error or Covariates (ie respectively, Structural, IIV, IOV, RUV or CovariateEffect)
+#' \itemize{
+#'  \item{name (compulsory): }{name of parameter (eg, CL, Vd, nCL, nVd, etc.)}
+#'  \item{label: }{description of parameter (eg, "Volume of distribution", "Apparent Clearance", etc.)}
+#'  \item{units: }{parameter unit (eg, L/h, 1/hr, etc)}
+#'  \item{trans: }{parameter transformation (ie, \%, exp, ilogit, sqrt, CV\%)}
+#'  \item{type: }{Typical Values, Between Subject Variability, Inter Occasion Variability, Residual Error or Covariates (ie respectively, Structural, IIV, IOV, RUV or CovariateEffect)}
+#'  }
 #'
 #' @param run_dir NONMEM model directory
 #' @param run_prefix NONMEM run number prefix
 #' @param runno NONMEM run number
-#' @param bootstrap flag for availability of bootstrap results.
+#' @param bootstrap flag for availability of bootstrap results
 #' @param run_dir.boot bootstrap results directory
-#' @param runno.boot bootstrap NONMEM run number (if changes from runno)
-#' @param conf.level bootstrap results confidence interval. By default set to 95%.
-#' @param min_succ filter bootstrap results on minimization successful. By default set to TRUE.
+#' @param runno.boot bootstrap NONMEM run number, if changes from runno
+#' @param conf.level bootstrap results confidence interval. By default set to 95\%
+#' @param min_suc filter bootstrap results on minimization successful. By default set to TRUE
 #' @param read.boot flag for reading directly the customized filtering bootstrap raw_results.csv
 #' @param boot.obj customized filtered bootstrap raw_results.csv data frame passed by user
-#' @param yaml.file flag for using the yaml.file option. All the non-compulsory fields (ie, label, trans, units, type) will be read from yaml file.
-#' @param yaml.file.name name of the yaml file.
-#' @return meta file information (df_m) and parameter information (prm)
+#' @param yaml.file flag for using the yaml.file option; all the non-compulsory fields
+#'  e.g., label, trans, units, type will be read from yaml file
+#' @param yaml.file.name name of the yaml file
+#'
+#' @return
 #' @export
-
+#'
 parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir.boot = NULL, runno.boot = NULL, conf.level = 0.95, min_suc = TRUE, read.boot = NULL, boot.obj = NULL, yaml.file = NULL, yaml.file.name = NULL) {
 
   stopifnot(dir.exists(run_dir))
@@ -167,15 +172,15 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
 #' @title Create parameter \code{data.frame}
 #'
 #' @description Get all relevant parameter information in a data.frame, input the desired transformation for parameters
-
 #' and finally merge parameter estimates with their corresponding meta information
 #'
 #' @param out paramter data frame from parframe2setup
 #' @param meta meta information data frame from parframe2setup
 #' @param bootstrap flag for availability of bootstrap results
-#' @param conf.level confidence interval of parameter estimates using normal distribution assumptions (in case no bootstrap rasults are available). By default set to 95%.
+#' @param conf.level confidence interval of parameter estimates using normal distribution assumptions (in case no bootstrap results are available).
+#' By default set to 95\%.
+#'
 #' @export
-
 parframe <- function(out, meta, bootstrap = NULL, conf.level = 0.95) {
   z <- meta
 
@@ -418,38 +423,14 @@ pmxpartab <- function(
   structure(table, class=c("pmxpartab", "html", "character"), html=TRUE)
 }
 
-# Internal function to help format numbers
-p <- function(x, digits=3, flag="", round.integers=FALSE){
-  if (!is.numeric(x)) {
-    return(x)
-  }
-  prefix <- ifelse(flag=="+" & x > 0, "+", "")
-  paste0(prefix, table1::signif_pad(x, digits=digits, round.integers=round.integers))
-}
 
-#' Title
+#' Parse parameter description
 #'
-#' @param label
-#' @param ncolumns
+#' @param string Character string
 #'
-#' @return
+#' @return Character; parameter description
 #' @export
 #'
-#' @examples
-parameter.estimate.table.section <- function(label, ncolumns) {
-  paste0(c('<tr>',
-           paste0(sprintf('<td class="paramsectionheading">%s</td>', c(label, rep("", ncolumns-1))), collapse='\n'),
-           '</tr>'), collapse='\n')
-}
-
-#' parse_parameter_description
-#'
-#' @param string
-#'
-#' @return
-#' @export
-#'
-#' @examples
 parse_parameter_description <- function(string) {
   # Returns a structured object representing a description of a parameter
   # (in this example just a list with some attributes; only the name is mandatory)
@@ -462,37 +443,23 @@ parse_parameter_description <- function(string) {
   eval(x)
 }
 
-#' parameter.estimate.table.row
-#'
-#' @param name
-#' @param label
-#' @param units
-#' @param type
-#' @param trans
-#' @param expression
-#' @param relatedTo
-#' @param superscript
-#' @param fixed
-#' @param value
-#' @param se
-#' @param rse
-#' @param lci95
-#' @param uci95
-#' @param boot.median
-#' @param boot.lci
-#' @param boot.uci
-#' @param shrinkage
-#' @param na
-#' @param digits
-#' @param indent
-#' @param have.bootstrap
-#' @param columns
-#' @param ...
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
+# Internal functions ----
+p <- function(x, digits=3, flag="", round.integers=FALSE){
+  if (!is.numeric(x)) {
+    return(x)
+  }
+  prefix <- ifelse(flag=="+" & x > 0, "+", "")
+  paste0(prefix, table1::signif_pad(x, digits=digits, round.integers=round.integers))
+}
+
+
+parameter.estimate.table.section <- function(label, ncolumns) {
+  paste0(c('<tr>',
+           paste0(sprintf('<td class="paramsectionheading">%s</td>', c(label, rep("", ncolumns-1))), collapse='\n'),
+           '</tr>'), collapse='\n')
+}
+
 parameter.estimate.table.row <- function(
   name,
   label          = NULL,

@@ -2,16 +2,16 @@
 % Please edit documentation in R/functions.R
 \name{parse_parameter_description}
 \alias{parse_parameter_description}
-\title{parse_parameter_description}
+\title{Parse parameter description}
 \usage{
 parse_parameter_description(string)
 }
 \arguments{
-\item{string}{}
+\item{string}{Character string}
 }
 \value{
-
+Character; parameter description
 }
 \description{
-parse_parameter_description
+Parse parameter description
 }
