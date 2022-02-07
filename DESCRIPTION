@@ -16,6 +16,7 @@ LazyData: true
 RoxygenNote: 7.1.2
 Suggests:
     knitr,
+    testthat (>= 3.0.0)
 Imports:
     data.table,
     dplyr,
@@ -24,6 +25,8 @@ Imports:
     stringr,
     tidyr,
     table1,
+    tibble,
     utils,
     xpose,
     yaml
+Config/testthat/edition: 3
