@@ -20,13 +20,14 @@ version directly from GitHub:
 
     output <- parframe2setup(run_dir = file.path(system.file(package = "pmxpartabc"), "examples"), 
                           run_prefix = "run", 
-                          runno = "6", 
+                          runno = "5",
+                          bootstrap = TRUE,
+                          run_dir.boot = file.path(system.file(package = "pmxpartabc"), "examples", "bootstrap_dir2"),
+                          runno.boot = "5boot",
                           conf.level = 0.95, 
-                          min_suc = TRUE, 
-                          yaml.file = TRUE, 
-                          yaml.file.name = file.path(system.file(package = "pmxpartabc"), "meta.yaml"))
+                          min_suc = TRUE)
 
-    tab <- parframe(out=output[[1]], meta=output[[2]])  
+    tab <- parframe(out=output[[1]], meta=output[[2]], bootstrap = TRUE)  
 
     tab1 <- pmxpartab(tab, output[[2]], columns=c(value="Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage"))
 
@@ -68,7 +69,7 @@ Typical Values
 </tr>
 <tr>
 <td class="paramlabelindent">
-Central volume (L)
+Central Volume (L)
 </td>
 <td>
 24.7
@@ -77,7 +78,7 @@ Central volume (L)
 8.29
 </td>
 <td>
-20.7 – 28.7
+21.7 – 26.8
 </td>
 <td>
 </td>
@@ -93,14 +94,14 @@ Clearance (L/h)
 249
 </td>
 <td>
--2.56 – 3.87
+0.303 – 0.759
 </td>
 <td>
 </td>
 </tr>
 <tr>
 <td class="paramlabelindent">
-Peripheral volume (L)
+Peripheral Volume (L)
 </td>
 <td>
 76.5
@@ -109,14 +110,14 @@ Peripheral volume (L)
 195
 </td>
 <td>
--216 – 369
+68.4 – 115
 </td>
 <td>
 </td>
 </tr>
 <tr>
 <td class="paramlabelindent">
-Peripheral clearance (L/h)
+Intercompartimental Clearance (L/h)
 </td>
 <td>
 1.83
@@ -125,14 +126,14 @@ Peripheral clearance (L/h)
 34.7
 </td>
 <td>
-0.587 – 3.08
+1.83 – 1.95
 </td>
 <td>
 </td>
 </tr>
 <tr>
 <td class="paramlabelindent">
-Absorption rate constant (h<sup>-1</sup>)
+Absorption Rate (h-1)
 </td>
 <td>
 0.653
@@ -141,7 +142,7 @@ Absorption rate constant (h<sup>-1</sup>)
 52.7
 </td>
 <td>
--0.0211 – 1.33
+0.559 – 0.790
 </td>
 <td>
 </td>
@@ -161,7 +162,7 @@ Between Subject Variability
 </tr>
 <tr>
 <td class="paramlabelindent">
-On Central volume
+On Volume
 </td>
 <td>
 0.169
@@ -170,7 +171,7 @@ On Central volume
 22.2
 </td>
 <td>
-0.0955 – 0.242
+0.0999 – 0.219
 </td>
 <td>
 0.300%
@@ -178,7 +179,7 @@ On Central volume
 </tr>
 <tr>
 <td class="paramlabelindent">
-Correlation on Clearance, on Central Volume
+Correlation On Clearance,On Volume
 </td>
 <td>
 0.140
@@ -187,7 +188,7 @@ Correlation on Clearance, on Central Volume
 199
 </td>
 <td>
--0.406 – 0.687
+0.0928 – 0.336
 </td>
 <td>
 </td>
@@ -203,7 +204,7 @@ On Clearance
 282
 </td>
 <td>
--1.62 – 2.34
+0.234 – 1.62
 </td>
 <td>
 1.30%
@@ -233,7 +234,7 @@ Proportional Error (-)
 147
 </td>
 <td>
--0.191 – 0.396
+0.0977 – 0.115
 </td>
 <td>
 20.1%

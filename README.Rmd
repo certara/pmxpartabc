@@ -29,13 +29,14 @@ library(pmxpartabc)
 
 output <- parframe2setup(run_dir = file.path(system.file(package = "pmxpartabc"), "examples"), 
                       run_prefix = "run", 
-                      runno = "6", 
+                      runno = "5",
+                      bootstrap = TRUE,
+                      run_dir.boot = file.path(system.file(package = "pmxpartabc"), "examples", "bootstrap_dir2"),
+                      runno.boot = "5boot",
                       conf.level = 0.95, 
-                      min_suc = TRUE, 
-                      yaml.file = TRUE, 
-                      yaml.file.name = file.path(system.file(package = "pmxpartabc"), "meta.yaml"))
+                      min_suc = TRUE)
 
-tab <- parframe(out=output[[1]], meta=output[[2]])  
+tab <- parframe(out=output[[1]], meta=output[[2]], bootstrap = TRUE)  
 
 tab1 <- pmxpartab(tab, output[[2]], columns=c(value="Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage"))
 
