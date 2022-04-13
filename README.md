@@ -27,11 +27,14 @@ version directly from GitHub:
                           conf.level = 0.95, 
                           min_suc = TRUE)
 
-    tab <- parframe(out=output[[1]], meta=output[[2]], bootstrap = TRUE)  
+    df <- parframe(out=output[[1]], meta=output[[2]], bootstrap = TRUE)  
 
-    tab1 <- pmxpartab(tab, output[[2]], columns=c(value="Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage"))
+    table <- pmxpartab(df, 
+                       meta = output[[2]],
+                       columns=c(value="Estimate", boot.median = "Bootstrap Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage")
+                       )
 
-    print(tab1)
+    print(table)
 
 <table>
 <thead>
@@ -41,6 +44,9 @@ Parameter
 </th>
 <th>
 Estimate
+</th>
+<th>
+Bootstrap Estimate
 </th>
 <th>
 RSE%
@@ -66,6 +72,8 @@ Typical Values
 </td>
 <td class="paramsectionheading">
 </td>
+<td class="paramsectionheading">
+</td>
 </tr>
 <tr>
 <td class="paramlabelindent">
@@ -73,6 +81,9 @@ Central Volume (L)
 </td>
 <td>
 24.7
+</td>
+<td>
+24.9
 </td>
 <td>
 8.29
@@ -91,6 +102,9 @@ Clearance (L/h)
 0.659
 </td>
 <td>
+0.669
+</td>
+<td>
 249
 </td>
 <td>
@@ -105,6 +119,9 @@ Peripheral Volume (L)
 </td>
 <td>
 76.5
+</td>
+<td>
+79.4
 </td>
 <td>
 195
@@ -123,6 +140,9 @@ Intercompartimental Clearance (L/h)
 1.83
 </td>
 <td>
+1.89
+</td>
+<td>
 34.7
 </td>
 <td>
@@ -137,6 +157,9 @@ Absorption Rate (h-1)
 </td>
 <td>
 0.653
+</td>
+<td>
+0.636
 </td>
 <td>
 52.7
@@ -159,10 +182,15 @@ Between Subject Variability
 </td>
 <td class="paramsectionheading">
 </td>
+<td class="paramsectionheading">
+</td>
 </tr>
 <tr>
 <td class="paramlabelindent">
 On Volume
+</td>
+<td>
+0.169
 </td>
 <td>
 0.169
@@ -185,6 +213,9 @@ Correlation On Clearance,On Volume
 0.140
 </td>
 <td>
+0.139
+</td>
+<td>
 199
 </td>
 <td>
@@ -199,6 +230,9 @@ On Clearance
 </td>
 <td>
 0.358
+</td>
+<td>
+0.368
 </td>
 <td>
 282
@@ -222,6 +256,8 @@ Residual Error
 </td>
 <td class="paramsectionheading">
 </td>
+<td class="paramsectionheading">
+</td>
 </tr>
 <tr>
 <td class="paramlabelindent">
@@ -229,6 +265,9 @@ Proportional Error (-)
 </td>
 <td>
 0.102
+</td>
+<td>
+0.104
 </td>
 <td>
 147

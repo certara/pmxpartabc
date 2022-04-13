@@ -36,11 +36,14 @@ output <- parframe2setup(run_dir = file.path(system.file(package = "pmxpartabc")
                       conf.level = 0.95, 
                       min_suc = TRUE)
 
-tab <- parframe(out=output[[1]], meta=output[[2]], bootstrap = TRUE)  
+df <- parframe(out=output[[1]], meta=output[[2]], bootstrap = TRUE)  
 
-tab1 <- pmxpartab(tab, output[[2]], columns=c(value="Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage"))
+table <- pmxpartab(df, 
+                   meta = output[[2]],
+                   columns=c(value="Estimate", boot.median = "Bootstrap Estimate", rse="RSE%", ci95="95%CI", shrinkage="Shrinkage")
+                   )
 
-print(tab1)
+print(table)
 
 ```
 

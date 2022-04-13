@@ -404,8 +404,8 @@ pmxpartab <- function(
       newsection <- (!is.null(parframe$type) && !is.na(parframe$type[i]) && (i == 1 || parframe$type[i] != parframe$type[i-1]))
       if (newsection) {
         type <- parframe$type[i]
-        if (type %in% names(meta$labels)) {
-          label <- meta$labels[[type]]
+        if (type %in% names(meta$label)) {
+          label <- meta$label[[type]]
         } else if (type %in% names(section.labels)) {
           label <- section.labels[[type]]
         } else {
@@ -415,7 +415,7 @@ pmxpartab <- function(
         tbody <- paste0(tbody, parameter.estimate.table.section(label, ncolumns=ncolumns), '\n')
       }
     }
-    args <- c(parframe[i,], list(na=na, digits=digits, indent=sections))
+    args <- c(parframe[i,], list(na=na, digits=digits, indent=sections, columns=columns))
     tbody <- paste0(tbody, do.call(parameter.estimate.table.row, args), '\n')
   }
 
@@ -548,7 +548,7 @@ parameter.estimate.table.row <- function(
     }
   }
 
-  all <- c(value=value, rse=rse, ci95=ifelse(have.bootstrap,boot.ci95,ci95), shrinkage=shrinkage) #changed est to value
+  all <- c(value=value, rse=rse, ci95=ifelse(have.bootstrap,boot.ci95,ci95), shrinkage=shrinkage, boot.median = boot.median) #changed est to value
   paste0(c('<tr>',
            sprintf('<td class="%s">%s</td>', ifelse(isTRUE(indent), "paramlabelindent", "paramlabelnoindent"), label),
            paste0(sprintf('<td>%s</td>', all[names(columns)]), collapse='\n'),
