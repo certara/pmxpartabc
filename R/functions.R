@@ -136,7 +136,7 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
     shk.tmp = rbind(etashk,epsshk)
     prm = prm %>%
       dplyr::left_join(shk.tmp, by=c("type", "m", "n")) %>% dplyr::rename(shrinkage = shk)
-    if (prm$value[stringr::str_detect(prm$name.xpose,'SIGMA')]==1){ # error coded with fixed effects
+    if (length(prm$value[stringr::str_detect(prm$name.xpose,'SIGMA')])==1 && prm$value[stringr::str_detect(prm$name.xpose,'SIGMA')] ==1){ # error coded with fixed effects
 
       prm$shrinkage[stringr::str_detect(prm$label,'ERR') | stringr::str_detect(prm$label,'PROP') | stringr::str_detect(prm$label,'ADD')]=prm$shrinkage[stringr::str_detect(prm$name.xpose,'SIGMA')]
 
