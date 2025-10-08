@@ -1,5 +1,5 @@
 Package: pmxpartabc
-Version: 0.2.0
+Version: 0.2.1
 Date: 2022-02-04
 Title: Parameter Tables for PMx Analyses
 Authors@R: c(
@@ -13,7 +13,7 @@ Description: Generate paremeter estimates tables from NONMEM run output
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.2
 Suggests:
     knitr,
     testthat (>= 3.0.0)

@@ -120,28 +120,69 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
   }
 
   # merge shrinkage information
+  # flags
+  has_ome <- nrow(dplyr::filter(prm, type == "ome", !fixed)) > 0
+  has_sig <- nrow(dplyr::filter(prm, type == "sig", !fixed)) > 0
 
-  if (nrow(prm %>% dplyr::filter(type %in% c("ome","sig") & !fixed))>0) {
-    etashk = data.frame(type = "ome",
-                        shk = strsplit(xpdb$summary %>% dplyr::filter(label=="etashk") %>% dplyr::pull(value), split=", ")[[1]]) %>%
-      dplyr::mutate(m = as.numeric(gsub(".*\\[(\\d+)\\].*", "\\1", shk)),
-             n = m, # added to ensure that shrinkage only joins diagonal omega
-             shk = as.numeric(gsub("\\[.*", "", shk)))
+  shk_list <- list()
 
-    epsshk = data.frame(type = "sig",
-                        shk = strsplit(xpdb$summary %>% dplyr::filter(label=="epsshk") %>% dplyr::pull(value), split=", ")[[1]]) %>%
-      dplyr::mutate(m = as.numeric(gsub(".*\\[(\\d+)\\].*", "\\1", shk)),
-             n = m, # added to ensure that shrinkage only joins diagonal omega
-             shk = as.numeric(gsub("\\[.*", "", shk)))
-    shk.tmp = rbind(etashk,epsshk)
-    prm = prm %>%
-      dplyr::left_join(shk.tmp, by=c("type", "m", "n")) %>% dplyr::rename(shrinkage = shk)
-    if (length(prm$value[stringr::str_detect(prm$name.xpose,'SIGMA')])==1 && prm$value[stringr::str_detect(prm$name.xpose,'SIGMA')] ==1){ # error coded with fixed effects
+  # build shrinkage for OMEGA if needed
+  if (has_ome) {
+    etashk <- data.frame(
+      type = "ome",
+      shk  = strsplit(
+        xpdb$summary %>%
+          dplyr::filter(label == "etashk") %>%
+          dplyr::pull(value),
+        split = ", "
+      )[[1]]
+    ) %>%
+      dplyr::mutate(
+        m   = as.numeric(gsub(".*\\[(\\d+)\\].*", "\\1", shk)),
+        n   = m, # ensure shrinkage only joins diagonal omega
+        shk = as.numeric(gsub("\\[.*", "", shk))
+      )
+    shk_list[["ome"]] <- etashk
+  }
 
-      prm$shrinkage[stringr::str_detect(prm$label,'ERR') | stringr::str_detect(prm$label,'PROP') | stringr::str_detect(prm$label,'ADD')]=prm$shrinkage[stringr::str_detect(prm$name.xpose,'SIGMA')]
+  # build shrinkage for SIGMA if needed
+  if (has_sig) {
+    epsshk <- data.frame(
+      type = "sig",
+      shk  = strsplit(
+        xpdb$summary %>%
+          dplyr::filter(label == "epsshk") %>%
+          dplyr::pull(value),
+        split = ", "
+      )[[1]]
+    ) %>%
+      dplyr::mutate(
+        m   = as.numeric(gsub(".*\\[(\\d+)\\].*", "\\1", shk)),
+        n   = m, # ensure shrinkage only joins diagonal omega (by analogy)
+        shk = as.numeric(gsub("\\[.*", "", shk))
+      )
+    shk_list[["sig"]] <- epsshk
+  }
 
+  # only proceed if we created at least one set
+  if (length(shk_list) > 0) {
+    shk.tmp <- dplyr::bind_rows(shk_list)
+
+    prm <- prm %>%
+      dplyr::left_join(shk.tmp, by = c("type", "m", "n")) %>%
+      dplyr::rename(shrinkage = shk)
+
+    # apply the SIGMA==1 special-case only if we have any SIGMA rows
+    if (has_sig &&
+        length(prm$value[stringr::str_detect(prm$name.xpose, "SIGMA")]) == 1 &&
+        prm$value[stringr::str_detect(prm$name.xpose, "SIGMA")] == 1) {
+
+      prm$shrinkage[
+        stringr::str_detect(prm$label, "ERR") |
+          stringr::str_detect(prm$label, "PROP") |
+          stringr::str_detect(prm$label, "ADD")
+      ] <- prm$shrinkage[stringr::str_detect(prm$name.xpose, "SIGMA")]
     }
-
   }
 
   # merge bootstrap information

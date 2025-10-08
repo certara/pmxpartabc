@@ -45,9 +45,6 @@ e.g., label, trans, units, type will be read from yaml file}
 
 \item{yaml.file.name}{name of the yaml file}
 }
-\value{
-
-}
 \description{
 Reads all relevant inputs (ie, parameter estimates, bootstrap, shrinkage, etc.) using directly model run or with the help of a YAML file.
 The parameter name must be provided in the model file. Other fields are optional and can be provided either in (1) the model file or a (2) YAML file.
