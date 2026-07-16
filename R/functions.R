@@ -79,7 +79,19 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
 
     prm$name = unlist(lapply(prm$meta, function(x) x[c('name')]))
 
-    df_m = do.call(dplyr::bind_rows, list(parmaters=prm$meta)) %>% tibble::as_tibble() %>% dplyr::mutate(type = factor(type, levels = c('Structural','CovariateEffect','IIV', 'IOV','RUV'))) %>% dplyr::arrange(type) %>% dplyr::mutate(type = as.character(type))
+    df_m = do.call(dplyr::bind_rows, list(parmaters=prm$meta)) %>% tibble::as_tibble()
+
+    # Ensure optional meta columns always exist, even when no parameter comment
+    # declares them (e.g. a model with no `trans=` attribute anywhere). Without
+    # this, a missing `trans` column propagates downstream and forces
+    # parameter.estimate.table.row() to fall back to a length>1 default, which
+    # breaks `&&` under R >= 4.3.
+    if (is.null(df_m$trans)) { df_m$trans <- NA }
+    if (is.null(df_m$units)) { df_m$units <- NA }
+    if (is.null(df_m$label)) { df_m$label <- NA }
+    if (is.null(df_m$type))  { df_m$type  <- NA }
+
+    df_m = df_m %>% dplyr::mutate(type = factor(type, levels = c('Structural','CovariateEffect','IIV', 'IOV','RUV'))) %>% dplyr::arrange(type) %>% dplyr::mutate(type = as.character(type))
 
   } else { #yaml file
     stopifnot(file.exists(yaml.file.name))
@@ -224,6 +236,10 @@ parframe2setup <- function(run_dir, run_prefix, runno, bootstrap = NULL, run_dir
 #' @export
 parframe <- function(out, meta, bootstrap = NULL, conf.level = 0.95) {
   z <- meta
+
+  # Guarantee a `trans` column so downstream access is safe and quiet even when
+  # the model declares no `trans=` attribute (tibbles warn on missing columns).
+  if (!"trans" %in% names(z)) { z$trans <- NA }
 
   z$fixed     <- as.logical(NA)
   z$value     <- as.numeric(NA)
@@ -505,8 +521,8 @@ parameter.estimate.table.row <- function(
   name,
   label          = NULL,
   units          = NULL,
-  type           = c("Structural", "CovariateEffect", "IIV", "IOV", "RUV", "Unspecified"),
-  trans          = c("identity", "%", "exp", "ilogit", "CV%", "SD (CV%)"),
+  type           = NULL,
+  trans          = NULL,
   expression     = NULL,
   relatedTo      = NULL,
   superscript    = NULL,
